@@ -1,6 +1,8 @@
 package NEOfr.GameLogic.Unit;
 
 
+import org.apache.log4j.LogManager;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -13,38 +15,50 @@ public class Unit {
     }
 
     public Unit (int xPos, int yPos) {
+        this.height = DEFAULT_HEIGHT;
+        this.width  = DEFAULT_WIDTH;
+        this.health = DEFAULT_HEALTH;
+
         this.xPos = xPos;
         this.yPos = yPos;
-        this.isAlive = true;
-        this.health = DEFAULT_HEALTH;
-        this.height = DEFAULT_HEIGHT;
-        this.width = DEFAULT_WIDTH;
-    }
-    public void doAction(){
 
+        this.headY1 = yPos - this.height;
+        this.headY2 = yPos;
+
+        this.headX1 = this.xPos;
+        this.headX2 = this.headX1 + this.width;
+
+        this.isAlive = true;
     }
-    public boolean isTouch(int x, int y){
-        if( x < xPos+width && x > xPos &&
-                y < yPos && y > yPos - height)
-            return true;
-        return false;
-    }
-    public boolean isTouch(int startX, int startY, int dstX, int dstY   ){
-        double k = 0;  //find line y = kx+b
-        double b = 0;
-        k = (dstY - startY) / (dstX - dstY);
+
+    public boolean getShot(int startX, int startY, int dstX, int dstY, int damage){
+        int damage_ = 0;
+        boolean isShoted = false;
+        double k;
+        double b;
+
+        k = (double) (dstY - startY)/(dstX - startX);
         b = dstY - k*dstX;
 
-        if( (k*xPos + b) < yPos && (k*xPos + b) >= yPos - height ){
-            return true;
+        if( (b + k*xPos)<=yPos && (b + k*(xPos+width) )>=(yPos - height)  ){
+            damage_ += damage;
+            isShoted = true;
+            System.out.println("shootted ");
         }
-        return false;
 
+        if( (b + k*headX1)<=headY1 && (b + k*(headX2) )>=headY2  ){
+            damage_ += 2*damage;
+            isShoted = true;
+            System.out.println("shootted in head");
+        }
+
+        getDamage(damage_, this);
+
+        return isShoted;
     }
 
 
-
-    public boolean getDamage(int damage){
+    public boolean getDamage(int damage, Unit asker){
         this.health -= damage;
         if( this.health <= 0 ){
             die();
@@ -60,13 +74,21 @@ public class Unit {
     static public int DEFAULT_HEALTH = 100;
 
     protected void die(){
+        logger.debug("die");
         health = 0;
         isAlive = false;
     }
     protected int xPos;
+
+    protected int headX1;
+    protected int headX2;
+    protected int headY1;
+    protected int headY2;
+
     protected int yPos;
     private boolean isAlive;
     protected int health;
+    protected org.apache.log4j.Logger logger = LogManager.getLogger(Unit.class);
 
     public int getY() {
         return yPos;

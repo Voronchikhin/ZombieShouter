@@ -1,8 +1,12 @@
 package NEOfr.GameLogic.Level;
 
+import NEOfr.GameLogic.Unit.Barrier;
 import NEOfr.GameLogic.Unit.Enemy;
 import NEOfr.GameLogic.Unit.EnemyManager;
 import NEOfr.GameLogic.Unit.Unit;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
+import org.apache.log4j.BasicConfigurator;
 
 
 import java.util.LinkedList;
@@ -10,9 +14,9 @@ import java.util.List;
 
 public class Level {
 
-
     public Level(int complexity, ActionListener playerActionListener, LevelObserver levelObserver) {
-        logger.
+        BasicConfigurator.configure();
+        logger.debug("level created");
         this.complexity = complexity;
         this.playerActionListener = playerActionListener;
         this.levelObserver = levelObserver;
@@ -21,14 +25,14 @@ public class Level {
         waveNumber = 0;
         isEnded = false;
         units = new LinkedList<>();
-        logger.debug("level created");
         this.enemyManager = new EnemyManager() {
             @Override
-            public List<Enemy> getWave(int waveNumber, int complexity) {
-                return super.getWave(waveNumber, complexity);
+            public List<Enemy> getWave(int waveNumber, int complexity, int width) {
+                return super.getWave(waveNumber, complexity,width);
             }
         };
-        enemies = this.enemyManager.getWave(this.waveNumber, this.complexity);
+        units.add(new Barrier(800,500));
+        enemies = this.enemyManager.getWave(this.waveNumber, this.complexity,width);
     }
 
     public static int getDefaultWidth() {
@@ -40,8 +44,10 @@ public class Level {
     }
 
     public void tick(){
-        logger.debug("tick started");
+        logger.trace("tick started");
+        levelObserver.updatePlayer(player);
         action = playerActionListener.getAction();
+        playerActionListener.setAction(new Action(0,0));
         isEdited = changeWorld();
         if(isEdited){
             logger.debug("static objects has changed");
@@ -49,7 +55,7 @@ public class Level {
             isEdited = false;
         }
         levelObserver.updateActiveObjects(enemies);
-        logger.debug("tick ended");
+        logger.trace("tick ended");
     }
 
 
@@ -84,19 +90,25 @@ public class Level {
         }
 
         for (Enemy enemy : enemies) {
-            if (enemy.attack() == true ){
+            if (enemy.attack(units)){
                 isEdited = true;
             }
         }
 
-        enemies.removeIf(enemy -> {return (enemy.isAlive()==false);});
-
-        return false;
+        units.removeIf(unit -> {return (!unit.isAlive());});
+        enemies.removeIf(enemy -> {return (!enemy.isAlive());});
+        if( enemies.isEmpty() ){
+            enemies = enemyManager.getWave(waveNumber++,complexity,width);
+        }
+        return isEdited;
     }
 
 
+
+    Player player = new Player();
+
     public static int DEFAULT_WIDTH = 1200;
-    public static int DEFAULT_HEIGHT = 1200;
+    public static int DEFAULT_HEIGHT = 600;
 
     private boolean isEdited = true;
     private boolean isEnded;
@@ -104,12 +116,31 @@ public class Level {
     private int height;
 
     private void actionHandle(int x, int y){
-
+        logger.debug("action handle");
+        player.addBullet();
     }
 
     private void shotHandle(int x, int y){
+        logger.debug("shot handle");
+        int bulletPower = player.getBulletPower();
+        if( player.getBulletCount() <= 0 ){
+            return;
+        }
+        player.deleteBullet();
+
+        for( Enemy enemy : enemies){
+            if(bulletPower <= 0){
+                return;
+            }
+            if( enemy.getShot(player.getRifleX()+player.getxPos(),player.getRifleY()+player.getyPos(),x,y, 15*bulletPower)){
+                bulletPower--;
+            }
+        }
 
     }
+
+
+
 
     private List<Unit> units;
     private List<Enemy> enemies;
@@ -117,7 +148,7 @@ public class Level {
     private int complexity;
     private int waveNumber;
     private EnemyManager enemyManager;
-    static org.apache.log4j.Logger logger = org.apache.log4j.LogManager.getLogger(Level.class);
+    static Logger logger = LogManager.getLogger(Level.class);
     private ActionListener playerActionListener;
     private LevelObserver levelObserver;
 }
