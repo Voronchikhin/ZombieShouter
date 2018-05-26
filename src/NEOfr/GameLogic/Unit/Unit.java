@@ -79,14 +79,14 @@ public class Unit {
         isAlive = false;
     }
     protected int xPos;
-
+    protected String id = "spike";
     protected int headX1;
     protected int headX2;
     protected int headY1;
     protected int headY2;
 
     protected int yPos;
-    private boolean isAlive;
+    protected boolean isAlive;
     protected int health;
     protected org.apache.log4j.Logger logger = LogManager.getLogger(Unit.class);
 
@@ -100,5 +100,9 @@ public class Unit {
 
     public int getHeight() {
         return height;
+    }
+
+    public String getId() {
+        return id;
     }
 }

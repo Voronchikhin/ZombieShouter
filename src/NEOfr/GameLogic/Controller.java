@@ -4,29 +4,47 @@ import NEOfr.GameLogic.Level.Level;
 import NEOfr.GameLogic.Level.LevelObserver;
 import NEOfr.GameLogic.Level.Player;
 import NEOfr.GameLogic.Unit.Unit;
-import NEOfr.GameLogic.View.View;
+import NEOfr.GameLogic.View.GamePanel;
+import NEOfr.GameLogic.View.MenuPanel;
 import NEOfr.GameLogic.View.ViewElement;
+import NEOfr.GameLogic.View.ViewFactory;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
 public class Controller {
-    private View view = new View(1200,600);
-    private Level game = new Level(1, view.getListener(), new LevelObserver() {
+
+    private GamePanel gamePanel;
+    private MenuPanel menuPanel;
+    Timer timer = new Timer();
+    private boolean started = false;
+    private Player player;
+    private Level game;
+    private List<ViewElement> stat = new LinkedList<>();
+    private List<ViewElement> dyn = new LinkedList<>();
+    private LevelObserver levelObserver = new LevelObserver() {
+        @Override
+        public void updateScore(int score) {
+            gamePanel.setScore(score);
+        }
+
         @Override
         public void updatePlayer(Player playerr) {
             player = playerr;
-            view.setPlayer(player);
+            gamePanel.setPlayer(player);
         }
 
         @Override
         public void updateStaticObjects(List<? extends Unit> staticObjects) {
             stat.clear();
             for( Unit unit : staticObjects){
-                stat.add(new ViewElement("background.png",unit.getWidth(),unit.getHeight(), unit.getPos(), unit.getY() - unit.getHeight()));
+                stat.add(viewFactory.getViewElement(unit));
             }
         }
 
@@ -34,24 +52,53 @@ public class Controller {
         public void updateActiveObjects(List<? extends Unit> activeObjects) {
             dyn.clear();
             for( Unit unit : activeObjects ){
-                dyn.add(new ViewElement("zombie.png",unit.getWidth(),unit.getHeight(), unit.getPos(), unit.getY() - unit.getHeight()));
+                dyn.add(viewFactory.getViewElement(unit));
             }
         }
 
         @Override
         public void endGame(boolean isEnded) {
-            timer.cancel();
+            started = false;
 
         }
-    });
-    Timer timer = new Timer();
-    private boolean started;
-    private Player player;
-    private List<ViewElement> stat = new LinkedList<>();
-    private List<ViewElement> dyn = new LinkedList<>();
-    public Controller() {
-        started = true;
+    };
 
+    public void setConfigName(String configName) {
+        this.configName = configName;
+    }
+
+
+
+    private ViewFactory viewFactory;
+    public void setLevelName(String levelName) {
+        this.levelName = levelName;
+    }
+    public void setPlayerName(String playerName) {
+        this.playerName = playerName;
+    }
+
+
+    private String configName;          // uses to init view item factory
+    private String levelName;           // using to create level
+    private String playerName;          // uses to create game view
+
+    private int complexity= 1;
+    private void startGame(){
+        gamePanel = new GamePanel(1200,600,playerName);
+        game = new Level(complexity, gamePanel.getListener(), levelObserver,levelName);
+    }
+
+
+    public void stopMenu(){
+        menuPanel = null;
+        viewFactory = new ViewFactory(configName);
+        startGame();
+        started = true;
+    }
+    public Controller() {
+        //started = true;
+        //startGame();
+        menuPanel = new MenuPanel(new JFrame(), this);
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
@@ -59,13 +106,11 @@ public class Controller {
                     long start = System.currentTimeMillis();
                     game.tick();
                     long end = System.currentTimeMillis();
-                    start = System.currentTimeMillis();
-                    view.setActiveObjects(dyn);
-                    view.setStaticObjects(stat);
-                    end = System.currentTimeMillis();
-                    SwingUtilities.invokeLater(() -> view.draw());
+                    gamePanel.setActiveObjects(dyn);
+                    gamePanel.setStaticObjects(stat);
+                    SwingUtilities.invokeLater(() -> gamePanel.draw());
                 }
             }
-        },0,50);
+        },0,40);
     }
 }

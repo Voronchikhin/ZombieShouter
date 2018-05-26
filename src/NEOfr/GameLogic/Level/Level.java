@@ -11,10 +11,14 @@ import org.apache.log4j.BasicConfigurator;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 
 public class Level {
 
-    public Level(int complexity, ActionListener playerActionListener, LevelObserver levelObserver) {
+    private int endPos = 35;
+
+    public Level(int complexity, ActionListener playerActionListener, LevelObserver levelObserver, String levelName) {
+        player = new Player(levelName);
         BasicConfigurator.configure();
         logger.debug("level created");
         this.complexity = complexity;
@@ -44,6 +48,17 @@ public class Level {
     }
 
     public void tick(){
+        levelObserver.updateScore(this.score);
+        if(isEnded){
+            logger.info("game ends");
+            levelObserver.endGame(false);
+            return;
+        }
+        if(waveNumber > 8){
+            logger.info("player win");
+            levelObserver.endGame(true);
+            return;
+        }
         logger.trace("tick started");
         levelObserver.updatePlayer(player);
         action = playerActionListener.getAction();
@@ -63,6 +78,7 @@ public class Level {
     public int getWidth() {
         return width;
     }
+    private int score = 0;
 
     public int getHeight() {
         return height;
@@ -90,13 +106,20 @@ public class Level {
         }
 
         for (Enemy enemy : enemies) {
+            if(!enemy.isAlive()){
+                this.score +=10*(complexity + waveNumber+1);
+                continue;
+            }
             if (enemy.attack(units)){
                 isEdited = true;
+            }
+            if( enemy.getPos() <= endPos ){
+                isEnded = true;
             }
         }
 
         units.removeIf(unit -> {return (!unit.isAlive());});
-        enemies.removeIf(enemy -> {return (!enemy.isAlive());});
+        enemies.removeIf(enemy -> {return (!enemy.isAlive()); });
         if( enemies.isEmpty() ){
             enemies = enemyManager.getWave(waveNumber++,complexity,width);
         }
@@ -105,19 +128,20 @@ public class Level {
 
 
 
-    Player player = new Player();
+    private Player player ;
 
     public static int DEFAULT_WIDTH = 1200;
     public static int DEFAULT_HEIGHT = 600;
 
     private boolean isEdited = true;
-    private boolean isEnded;
+    private boolean isEnded = false;
     private int width;
     private int height;
 
     private void actionHandle(int x, int y){
         logger.debug("action handle");
-        player.addBullet();
+        player.handleAction(x,y,units);
+        levelObserver.updateStaticObjects(units);
     }
 
     private void shotHandle(int x, int y){

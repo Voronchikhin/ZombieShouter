@@ -3,6 +3,7 @@ package NEOfr.GameLogic.Unit;
 public class Spike extends Barrier {
     public Spike(int xPos, int yPos) {
         super(xPos, yPos);
+        super.id = "spike";
     }
 
     @Override

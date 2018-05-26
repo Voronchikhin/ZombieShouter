@@ -6,6 +6,7 @@ public class Barrier extends Unit {
         super.health *= 3;
         super.height = 300;
         super.width = 150;
+        super.id = "barrier";
         logger.info("created barrier at(xPos,yPos)");
     }
 }
