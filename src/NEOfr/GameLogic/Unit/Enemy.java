@@ -1,10 +1,7 @@
 package NEOfr.GameLogic.Unit;
 
-import java.awt.*;
 import java.util.List;
 import java.util.Random;
-
-import NEOfr.GameLogic.Unit.Barrier;
 
 public class Enemy extends Unit {
     public Enemy(int xPos, int yPos) {
@@ -20,25 +17,7 @@ public class Enemy extends Unit {
         super.headY2 = yPos-height;
     }
 
-    @Override
-    protected void die() {
-        if(new Random().nextInt(4) >= 3 && canRampage){
-            logger.info("get critical damage  rampage");
-            velocity*=2;
-            id = "crowlyEnemy";
-            int buf;
-            buf = width;
-            width = height/2;
-            height = buf;
-            canRampage = false;
-            super.headX1 = xPos;
-            super.headX2 = xPos+width;
-            super.headY1 = yPos - 3*height/4;
-            super.headY2 = yPos-height;
-            return;
-        }
-        super.die();
-    }
+    static public int DEFAULT_VELOCITY = -4;
 
     public boolean attack(List<?extends Unit> barriers){
         boolean changeEnvp = false;
@@ -61,7 +40,26 @@ public class Enemy extends Unit {
         return changeEnvp;
     }
     private boolean canRampage = true;
-    static public int DEFAULT_VELOCITY = -5;
+
+    @Override
+    protected void die() {
+        if (new Random().nextInt(4) >= 3 && canRampage) {
+            logger.info("get critical damage  rampage");
+            velocity /= 2;
+            id = "crowlyEnemy";
+            int buf;
+            buf = width;
+            width = height / 2;
+            height = buf;
+            canRampage = false;
+            super.headX1 = xPos;
+            super.headX2 = xPos + width;
+            super.headY1 = yPos - 3 * height / 4;
+            super.headY2 = yPos - height;
+            return;
+        }
+        super.die();
+    }
     protected int velocity;
     protected int damage = 15;
 }

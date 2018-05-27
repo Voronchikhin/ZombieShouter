@@ -9,7 +9,7 @@ public abstract class EnemyManager {
         for( int i = 0; i < 5+waveNumber; ++i ){
             ((LinkedList<Enemy>) result).addLast(new Enemy(i*100+width, 500));
         }
-        if( waveNumber > 5 ){
+        if (waveNumber > 2) {
             ((LinkedList<Enemy>) result).addLast(new Boss(waveNumber*5+width,500));
         }
         return result;
