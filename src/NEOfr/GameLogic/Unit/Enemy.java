@@ -17,7 +17,7 @@ public class Enemy extends Unit {
         super.headY2 = yPos-height;
     }
 
-    static public int DEFAULT_VELOCITY = -4;
+    static public int DEFAULT_VELOCITY = -5;
 
     public boolean attack(List<?extends Unit> barriers){
         boolean changeEnvp = false;
@@ -46,16 +46,15 @@ public class Enemy extends Unit {
         if (new Random().nextInt(4) >= 3 && canRampage) {
             logger.info("get critical damage  rampage");
             velocity /= 2;
+            velocity++;
             id = "crowlyEnemy";
-            int buf;
-            buf = width;
-            width = height / 2;
-            height = buf;
+            super.width /= 2;
+            super.height /= 2;
             canRampage = false;
             super.headX1 = xPos;
-            super.headX2 = xPos + width;
-            super.headY1 = yPos - 3 * height / 4;
-            super.headY2 = yPos - height;
+            super.headX2 = xPos + super.width;
+            super.headY1 = yPos - 3 * super.height / 4;
+            super.headY2 = yPos - super.height;
             return;
         }
         super.die();

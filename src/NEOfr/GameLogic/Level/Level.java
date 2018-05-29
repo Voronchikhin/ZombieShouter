@@ -1,17 +1,14 @@
 package NEOfr.GameLogic.Level;
 
-import NEOfr.GameLogic.Unit.Barrier;
 import NEOfr.GameLogic.Unit.Enemy;
 import NEOfr.GameLogic.Unit.EnemyManager;
 import NEOfr.GameLogic.Unit.Unit;
+import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-import org.apache.log4j.BasicConfigurator;
-
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.ListIterator;
 
 public class Level {
 
@@ -35,7 +32,6 @@ public class Level {
                 return super.getWave(waveNumber, complexity,width);
             }
         };
-        units.add(new Barrier(800,500));
         enemies = this.enemyManager.getWave(this.waveNumber, this.complexity,width);
     }
 
@@ -175,4 +171,8 @@ public class Level {
     static Logger logger = LogManager.getLogger(Level.class);
     private ActionListener playerActionListener;
     private LevelObserver levelObserver;
+
+    public void restart() {
+
+    }
 }

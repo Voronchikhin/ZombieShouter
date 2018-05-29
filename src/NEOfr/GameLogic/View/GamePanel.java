@@ -4,15 +4,12 @@ import NEOfr.GameLogic.Level.Action;
 import NEOfr.GameLogic.Level.ActionListener;
 import NEOfr.GameLogic.Level.Player;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.event.MouseWheelEvent;
-import java.awt.image.BufferedImage;
-import java.awt.image.ImageConsumer;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -20,6 +17,12 @@ import java.util.List;
 public class GamePanel extends JPanel {
 
     private int score;
+    private Player player = null;
+
+
+    private List<ViewElement> activeElements = new LinkedList<>();
+    private List<ViewElement> staticElements = new LinkedList<>();
+
     public GamePanel(int width, int height, String playerImage) {
         setLayout(null);
         this.playerImage = playerImage;
@@ -33,7 +36,7 @@ public class GamePanel extends JPanel {
         frame.setVisible(true);
         this.addMouseListener(new MouseAdapter() {
             @Override
-            public void mouseClicked(MouseEvent e) {
+            public void mousePressed(MouseEvent e) {
                 playerAction.y = e.getY();
                 playerAction.x = e.getX();
                 playerAction.isShot = true;
@@ -57,12 +60,6 @@ public class GamePanel extends JPanel {
             }
         });
     }
-
-
-    private List<ViewElement> activeElements = new LinkedList<>();
-    private List<ViewElement> staticElements = new LinkedList<>();
-
-    private Player player;
     private int mouseX;
     private int mouseY;
 
@@ -105,20 +102,23 @@ public class GamePanel extends JPanel {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        g.drawImage(background,0,0,width,height,null);
-        g.drawImage(playerImg,player.getxPos(),player.getyPos(),player.getWidth(),player.getHeight(),null);
-        for( ViewElement view : activeElements ){
-            g.drawImage(view.sprite, view.x,view.y,view.width,view.height,null);
-        }
-        for( ViewElement view : staticElements  ){
-            g.drawImage(view.sprite, view.x,view.y,view.width,view.height,null);
-        }
+        if (player != null) {
+            g.drawImage(background, 0, 0, width, height, null);
+            g.drawImage(playerImg, player.getxPos(), player.getyPos(), player.getWidth(), player.getHeight(), null);
+            if (!activeElements.isEmpty())
+                for (ViewElement view : activeElements) {
+                    g.drawImage(view.sprite, view.x, view.y, view.width, view.height, null);
+                }
+            if (!staticElements.isEmpty())
+                for (ViewElement view : staticElements) {
+                    g.drawImage(view.sprite, view.x, view.y, view.width, view.height, null);
+                }
 
-        g.setColor(Color.RED);
-        g.drawLine(player.getRifleX()+player.getxPos(), player.getRifleY()+player.getyPos(), mouseX, mouseY);
-        g.drawString("bullets: "+String.valueOf(player.getBulletCount()),500,50);
-        g.drawString("Score :"+String.valueOf(score), 500,100);
-
+            g.setColor(Color.RED);
+            g.drawLine(player.getRifleX() + player.getxPos(), player.getRifleY() + player.getyPos(), mouseX, mouseY);
+            g.drawString("bullets: " + String.valueOf(player.getBulletCount()), 500, 50);
+            g.drawString("Score :" + String.valueOf(score), 500, 100);
+        }
     }
 
     public void draw() {

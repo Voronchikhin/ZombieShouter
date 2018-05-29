@@ -9,10 +9,7 @@ import NEOfr.GameLogic.View.MenuPanel;
 import NEOfr.GameLogic.View.ViewElement;
 import NEOfr.GameLogic.View.ViewFactory;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Timer;
@@ -58,7 +55,7 @@ public class Controller {
 
         @Override
         public void endGame(boolean isEnded) {
-            started = false;
+            game = new Level(complexity, gamePanel.getListener(), this, levelName);
 
         }
     };

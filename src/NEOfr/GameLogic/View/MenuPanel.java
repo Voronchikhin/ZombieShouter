@@ -5,7 +5,6 @@ import NEOfr.GameLogic.Controller;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.Closeable;
 import java.io.IOException;
 import java.util.Properties;
 
@@ -16,7 +15,6 @@ public class MenuPanel extends JPanel implements ActionListener {
         radios.add(Efremov);
         radios.add(Max);
         radios.add(Andrew);
-
         startButton.setActionCommand("start");
         Efremov.setActionCommand("Ivan");
         Max.setActionCommand("Max");
@@ -30,6 +28,7 @@ public class MenuPanel extends JPanel implements ActionListener {
         add(Andrew);
         add(startButton);
 
+        Andrew.doClick();
         frame.add(this);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(400,400);
