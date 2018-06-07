@@ -74,6 +74,11 @@ public class Level {
     public int getWidth() {
         return width;
     }
+
+    public int getScore() {
+        return score;
+    }
+
     private int score = 0;
 
     public int getHeight() {
@@ -172,7 +177,5 @@ public class Level {
     private ActionListener playerActionListener;
     private LevelObserver levelObserver;
 
-    public void restart() {
 
-    }
 }

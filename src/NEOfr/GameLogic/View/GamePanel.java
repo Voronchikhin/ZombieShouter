@@ -92,7 +92,9 @@ public class GamePanel extends JPanel {
     private boolean menuMode = true;
 
     public void setActiveObjects(List<ViewElement> dyn) {
-        activeElements = dyn;
+        synchronized (activeElements) {
+            activeElements = dyn;
+        }
     }
 
     public void setStaticObjects(List<ViewElement> stat) {
@@ -105,19 +107,22 @@ public class GamePanel extends JPanel {
         if (player != null) {
             g.drawImage(background, 0, 0, width, height, null);
             g.drawImage(playerImg, player.getxPos(), player.getyPos(), player.getWidth(), player.getHeight(), null);
-            if (!activeElements.isEmpty())
-                for (ViewElement view : activeElements) {
-                    g.drawImage(view.sprite, view.x, view.y, view.width, view.height, null);
-                }
-            if (!staticElements.isEmpty())
+            synchronized (activeElements) {
+                if (activeElements != null)
+                    if (!activeElements.isEmpty())
+                        for (ViewElement view : activeElements) {
+                            g.drawImage(view.sprite, view.x, view.y, view.width, view.height, null);
+                        }
+            }
+            if (staticElements != null)
                 for (ViewElement view : staticElements) {
                     g.drawImage(view.sprite, view.x, view.y, view.width, view.height, null);
                 }
 
-            g.setColor(Color.RED);
+            g.setColor(Color.cyan);
             g.drawLine(player.getRifleX() + player.getxPos(), player.getRifleY() + player.getyPos(), mouseX, mouseY);
-            g.drawString("bullets: " + String.valueOf(player.getBulletCount()), 500, 50);
-            g.drawString("Score :" + String.valueOf(score), 500, 100);
+            g.drawString("bullets: " + String.valueOf(player.getBulletCount()), 900, 50);
+            g.drawString("Score :" + String.valueOf(score), 900, 100);
         }
     }
 
@@ -135,5 +140,11 @@ public class GamePanel extends JPanel {
 
     public void setScore(int score) {
         this.score = score;
+    }
+
+    public void stop() {
+        frame.setVisible(false);
+        this.setVisible(false);
+        this.setEnabled(false);
     }
 }

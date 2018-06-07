@@ -8,6 +8,7 @@ public abstract class EnemyManager {
         List<Enemy> result = new LinkedList<>();
         for( int i = 0; i < 5+waveNumber; ++i ){
             ((LinkedList<Enemy>) result).addLast(new Enemy(i*100+width, 500));
+            ((LinkedList<Enemy>) result).getLast().setVelocity(((LinkedList<Enemy>) result).getLast().velocity - waveNumber / 2);
         }
         if (waveNumber > 2) {
             ((LinkedList<Enemy>) result).addLast(new Boss(waveNumber*5+width,500));

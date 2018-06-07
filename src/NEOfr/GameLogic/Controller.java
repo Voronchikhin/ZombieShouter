@@ -4,10 +4,7 @@ import NEOfr.GameLogic.Level.Level;
 import NEOfr.GameLogic.Level.LevelObserver;
 import NEOfr.GameLogic.Level.Player;
 import NEOfr.GameLogic.Unit.Unit;
-import NEOfr.GameLogic.View.GamePanel;
-import NEOfr.GameLogic.View.MenuPanel;
-import NEOfr.GameLogic.View.ViewElement;
-import NEOfr.GameLogic.View.ViewFactory;
+import NEOfr.GameLogic.View.*;
 
 import javax.swing.*;
 import java.util.LinkedList;
@@ -19,12 +16,13 @@ public class Controller {
 
     private GamePanel gamePanel;
     private MenuPanel menuPanel;
-    Timer timer = new Timer();
+    private Timer timer = new Timer();
     private boolean started = false;
     private Player player;
     private Level game;
     private List<ViewElement> stat = new LinkedList<>();
     private List<ViewElement> dyn = new LinkedList<>();
+    private ScoreBoard scoreBoard;
     private LevelObserver levelObserver = new LevelObserver() {
         @Override
         public void updateScore(int score) {
@@ -55,8 +53,11 @@ public class Controller {
 
         @Override
         public void endGame(boolean isEnded) {
-            game = new Level(complexity, gamePanel.getListener(), this, levelName);
-
+            timer.cancel();
+            started = false;
+            gamePanel.stop();
+            scoreBoard = new ScoreBoard(game.getScore());
+            //scoreBoard = new ScoreBoard(game.getScore());
         }
     };
 
@@ -78,8 +79,7 @@ public class Controller {
     private String configName;          // uses to init view item factory
     private String levelName;           // using to create level
     private String playerName;          // uses to create game view
-
-    private int complexity= 1;
+    private int complexity = 1;
     private void startGame(){
         gamePanel = new GamePanel(1200,600,playerName);
         game = new Level(complexity, gamePanel.getListener(), levelObserver,levelName);

@@ -61,4 +61,8 @@ public class Enemy extends Unit {
     }
     protected int velocity;
     protected int damage = 15;
+
+    public void setVelocity(int newVelocity) {
+        velocity = newVelocity;
+    }
 }

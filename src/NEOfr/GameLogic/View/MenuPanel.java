@@ -9,21 +9,26 @@ import java.io.IOException;
 import java.util.Properties;
 
 public class MenuPanel extends JPanel implements ActionListener {
+    //private JRadioButton Efremov = new JRadioButton("For Ivan Efremov");
+    private JRadioButton Andrew = new JRadioButton("mexicans");
+
+    private JFrame frame;
+    private JRadioButton Max = new JRadioButton("half life episode 3");
     public MenuPanel(JFrame frame, Controller controller) {
         this.observer = controller;
         this.frame = frame;
-        radios.add(Efremov);
+        //radios.add(Efremov);
         radios.add(Max);
         radios.add(Andrew);
         startButton.setActionCommand("start");
-        Efremov.setActionCommand("Ivan");
+        //Efremov.setActionCommand("Ivan");
         Max.setActionCommand("Max");
         Andrew.setActionCommand("Andrew");
         startButton.addActionListener(this);
-        Efremov.addActionListener(this);
+        //Efremov.addActionListener(this);
         Max.addActionListener(this);
         Andrew.addActionListener(this);
-        add(Efremov);
+        //add(Efremov);
         add(Max);
         add(Andrew);
         add(startButton);
@@ -35,11 +40,6 @@ public class MenuPanel extends JPanel implements ActionListener {
         frame.setResizable(false);
         frame.setVisible(true);
     }
-
-    private JFrame frame;
-    private JRadioButton Efremov = new JRadioButton("For Ivan Efremov");
-    private JRadioButton Andrew = new JRadioButton("For Andrew Kutalev");
-    private JRadioButton Max = new JRadioButton("For Maxim Voronchikhin");
     private JButton startButton = new JButton("click to start");
     private ButtonGroup radios = new ButtonGroup();
     private Controller observer;
